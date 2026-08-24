@@ -11,8 +11,9 @@ Your system must use exactly these two models, via OpenRouter:
 - Do not use `:free`, `:online`, or any other variant suffix, and do not use
   OpenRouter plugins or try to work around these restrictions.
 - At run time your system may contact **only** `openrouter.ai`, and only with
-  the two model IDs above. Web search and any other API or provider are off
-  limits.
+  the two model IDs above. Web search and any other API are off limits. The
+  harness may allow OpenRouter to use a different provider for the same model
+  when the original provider is unavailable.
 - There is no host Mathlib checkout to install or manage. Mathlib and all
   compiled artifacts are already inside the provided Lean container;
   generated Lean never runs on the host.
@@ -36,6 +37,9 @@ Your system must use exactly these two models, via OpenRouter:
 - Spend means OpenRouter's actual returned `usage.cost`, summed across both
   models and every call for that problem. The provided API reserves a
   conservative maximum before each request to avoid a final-call overshoot.
+- A rate-limited request with no reported cost does not consume budget. If an
+  error response reports `usage.cost`, that cost is counted. Failures with
+  uncertain spend close the problem's budget ledger.
 - Use of each allowed model is recorded in `result.json` and reviewed. Model
   participation is reported separately and is not an additional mechanical
   condition for the one-point Comparator score.

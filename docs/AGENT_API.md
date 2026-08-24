@@ -36,13 +36,18 @@ text = response.content
 
 The method also supports `top_p`, `seed`, `stop`, and ordinary local function
 tool schemas. It does not accept OpenRouter plugins, model variants, fallback
-routes, provider URLs, or arbitrary request bodies. Each call is logged and
-charged to the current problem's single ledger.
+models, provider URLs, or arbitrary request bodies. OpenRouter may retry another
+provider for the same requested model, subject to the harness price ceiling.
+Each call is logged and charged to the current problem's single ledger.
 
 There are no hidden retries. Import and catch `re_harness.LLMCallError`
 and decide explicitly whether
-another request is worthwhile. A transport failure makes spend uncertain and
-closes the ledger rather than risking an unreported overspend.
+another request is worthwhile. A rate-limited request that reports no cost
+leaves the ledger open for a retry. If an error response reports a cost, that
+cost is charged. Transport failures, cancelled requests, malformed success
+responses, and other uncertain failures close the ledger rather than risking an
+unreported overspend. Once the ledger is closed, the next call raises
+`BudgetAccountingError`.
 
 ## Lean feedback
 

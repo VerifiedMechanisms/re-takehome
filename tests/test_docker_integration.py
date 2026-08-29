@@ -11,7 +11,7 @@ import pytest
 from re_harness.events import EventLogger
 from re_harness.config import HarnessSettings
 from re_harness.lean import LeanClient, compare_solution
-from re_harness.manifest import ProblemSpec
+from re_harness.manifest import ProblemSpec, load_problem_set
 from re_harness.runner import run
 
 
@@ -82,6 +82,57 @@ def test_real_comparator_accepts_proof_and_rejects_statement_or_axiom():
         timeout_s=180,
     )
     assert not axiom.passed
+
+
+@pytest.mark.parametrize(
+    ("problem_id", "circular_solution"),
+    [
+        (
+            "putnam_2020_a2",
+            """import Mathlib
+
+abbrev putnam_2020_a2_solution : ℕ → ℕ :=
+  fun k => ∑ j ∈ Finset.Icc 0 k, 2 ^ (k - j) * Nat.choose (k + j) j
+
+theorem putnam_2020_a2 (k : ℕ) :
+    (∑ j ∈ Finset.Icc 0 k, 2 ^ (k - j) * Nat.choose (k + j) j) =
+      putnam_2020_a2_solution k := by
+  rfl
+""",
+        ),
+        (
+            "putnam_2018_a1",
+            """import Mathlib
+
+abbrev putnam_2018_a1_solution : Set (ℤ × ℤ) :=
+  {p | (1 : ℚ) / p.1 + (1 : ℚ) / p.2 = (3 : ℚ) / 2018}
+
+theorem putnam_2018_a1
+    (a b : ℤ) (h : 0 < a ∧ 0 < b) :
+    ((1 : ℚ) / a + (1 : ℚ) / b = (3 : ℚ) / 2018) ↔
+      (⟨a, b⟩ ∈ putnam_2018_a1_solution) := by
+  rfl
+""",
+        ),
+    ],
+)
+def test_fixed_putnam_statements_reject_circular_solutions(
+    problem_id: str, circular_solution: str
+) -> None:
+    problem_set = load_problem_set(Path("sample-problems"))
+    spec = next(problem for problem in problem_set.problems if problem.id == problem_id)
+    _, challenge_path = problem_set.paths(spec)
+
+    verdict = compare_solution(
+        image=IMAGE or "",
+        session_id=uuid.uuid4().hex,
+        challenge=challenge_path.read_text(encoding="utf-8"),
+        solution=circular_solution,
+        spec=spec,
+        timeout_s=180,
+    )
+
+    assert not verdict.passed
 
 
 def _one_problem_set(tmp_path: Path) -> Path:

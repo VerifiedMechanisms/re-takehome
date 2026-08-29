@@ -89,13 +89,13 @@
     {
       "id": "putnam_2020_a2",
       "theorem_names": ["putnam_2020_a2"],
-      "definition_names": ["putnam_2020_a2_solution"],
+      "definition_names": [],
       "numeric_answer_names": []
     },
     {
       "id": "putnam_2018_a1",
       "theorem_names": ["putnam_2018_a1"],
-      "definition_names": ["putnam_2018_a1_solution"],
+      "definition_names": [],
       "numeric_answer_names": []
     }
   ]

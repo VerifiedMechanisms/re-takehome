@@ -1,7 +1,7 @@
 # putnam_2020_a2
 
-Let $k$ be a nonnegative integer. Evaluate
+Let $k$ be a nonnegative integer. Prove that
 
-$$\sum_{j=0}^k 2^{k-j}\binom{k+j}{j}.$$
+$$\sum_{j=0}^k 2^{k-j}\binom{k+j}{j} = 4^k.$$
 
-Fill in `putnam_2020_a2_solution` and prove the theorem.
+Fill in the proof of `putnam_2020_a2`.
